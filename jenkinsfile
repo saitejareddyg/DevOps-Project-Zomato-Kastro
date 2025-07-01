@@ -81,13 +81,13 @@ pipeline {
         script {
             withDockerRegistry(credentialsId: 'docker', toolName: 'docker') {
                 sh '''
-                    mkdir -p ~/.docker/cli-plugins
-                    curl -sSfL https://raw.githubusercontent.com/docker/scout-cli/main/install.sh | sh -s -- --path ~/.docker/cli-plugins
-                    export PATH=$HOME/.docker/cli-plugins:$PATH
+                    mkdir -p /var/lib/jenkins/.docker/cli-plugins
+                    curl -sSfL https://raw.githubusercontent.com/docker/scout-cli/main/install.sh | sh -s -- -b /var/lib/jenkins/.docker/cli-plugins
+                    export PATH=/var/lib/jenkins/.docker/cli-plugins:$PATH
 
-                    ~/.docker/cli-plugins/docker-scout quickview saiteja8270/zomato:latest
-                    ~/.docker/cli-plugins/docker-scout cves saiteja8270/zomato:latest
-                    ~/.docker/cli-plugins/docker-scout recommendations saiteja8270/zomato:latest
+                    docker-scout quickview saiteja8270/zomato:latest
+                    docker-scout cves saiteja8270/zomato:latest
+                    docker-scout recommendations saiteja8270/zomato:latest
                 '''
             }
         }
