@@ -45,13 +45,18 @@ pipeline {
         }
 
         stage('OWASP FS SCAN') {
-            steps {
-                catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-                    dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit -n --autoUpdate', odcInstallation: 'DP-Check'
-                }
-                dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+    steps {
+        catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+            dependencyCheck additionalArguments: '--scan ./ --out . --disableYarnAudit --disableNodeAudit --autoUpdate', odcInstallation: 'DP-Check'
+        }
+        script {
+            if (!fileExists('dependency-check-report.xml')) {
+                echo "WARNING: OWASP report not generated!"
             }
         }
+        dependencyCheckPublisher pattern: 'dependency-check-report.xml'
+    }
+}
 
         stage ("Trivy File Scan") {
             steps {
@@ -93,7 +98,6 @@ pipeline {
         }
     }
 }
-
         stage ("Deploy to Container") {
             steps {
                 script {
@@ -125,7 +129,7 @@ pipeline {
                 """,
                 to: 'gaddam291555@gmail.com',
                 mimeType: 'text/html',
-                attachmentsPattern: 'trivy.txt'
+                attachmentsPattern: 'trivy.txt, dependency-check-report.xml'
         }
     }
 }
