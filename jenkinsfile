@@ -47,14 +47,14 @@ pipeline {
         stage('OWASP FS SCAN') {
     steps {
         catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-            dependencyCheck additionalArguments: '--scan ./ --out . --disableYarnAudit --disableNodeAudit --autoUpdate', odcInstallation: 'DP-Check'
+            dependencyCheck additionalArguments: '--scan ./ --project "Zomato" --out dependency-check-report --disableYarnAudit --disableNodeAudit', odcInstallation: 'DP-Check'
         }
         script {
-            if (!fileExists('dependency-check-report.xml')) {
+            if (!fileExists('dependency-check-report/dependency-check-report.xml')) {
                 echo "WARNING: OWASP report not generated!"
             }
         }
-        dependencyCheckPublisher pattern: 'dependency-check-report.xml'
+        dependencyCheckPublisher pattern: 'dependency-check-report/dependency-check-report.xml'
     }
 }
 
@@ -129,7 +129,7 @@ pipeline {
                 """,
                 to: 'gaddam291555@gmail.com',
                 mimeType: 'text/html',
-                attachmentsPattern: 'trivy.txt, dependency-check-report.xml'
+                attachmentsPattern: 'trivy.txt, dependency-check-report/dependency-check-report.xml'
         }
     }
 }
